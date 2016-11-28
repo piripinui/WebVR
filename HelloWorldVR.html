@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Cesium in Virtual Reality!</title>
+  <script src="../Build/CesiumUnminified/Cesium.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/cesiumvr.css">
+  <style>
+      @import url(../Build/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+	  #webgl-canvas, #presenting-message {
+        box-sizing: border-box;
+        height: 100%;
+        left: 0;
+        margin: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+      }
+      #presenting-message {
+        color: white;
+        font-family: sans-serif;
+        font-size: 2em;
+        font-weight: bold;
+        z-index: 1;
+        text-align: center;
+        padding: 0.5em;
+        background-color: #444;
+        display: none;
+      }
+	  #vr-sample-button-container {
+
+	  }
+  </style>
+  <script src="js/PerspectiveFrustumPatch.js"></script>
+  <script src="js/CanvasCopy.js"></script>
+  <script src="js/CesiumVR.js"></script>
+  <script src="js/CesiumVRUtil.js"></script>
+  <script src="js/webvr-polyfill.js"></script>
+  
+	<script>
+      var WebVRConfig = {
+        // Prevents the polyfill from initializing automatically.
+        DEFER_INITIALIZATION: true,
+        // Polyfill optimizations
+        DIRTY_SUBMIT_FRAME_BINDINGS: true,
+        BUFFER_SCALE: 0.75,
+      };
+    </script>
+	<script src="js/third-party/webvr-polyfill.js"></script>
+	<script src="js/third-party/wglu/wglu-url.js"></script>
+	<script>
+      // Dynamically turn the polyfill on if requested by the query args.
+      if (WGLUUrl.getBool('polyfill', false)) {
+        InitializeWebVRPolyfill();
+      } else {
+        // Shim for migration from older version of WebVR. Shouldn't be necessary for very long.
+        InitializeSpecShim();
+      }
+    </script>
+    <!-- End sample polyfill enabling logic -->
+
+    <script src="js/third-party/gl-matrix-min.js"></script>
+
+    <script src="js/third-party/wglu/wglu-program.js"></script>
+    <script src="js/third-party/wglu/wglu-stats.js"></script>
+    <script src="js/third-party/wglu/wglu-texture.js"></script>
+
+    <script src="js/vr-cube-sea.js"></script>
+    <script src="js/vr-samples-util.js"></script>
+	<script src="js/init.js"></script>
+</head>
+<body onload="init()">
+
+  <div id="cesiumContainer"></div>
+  <div id="presenting-message">Put on your headset now</div>
+  
+</body>
+</html>
