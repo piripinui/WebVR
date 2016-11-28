@@ -152,12 +152,12 @@ function init() {
 			if (vrDisplay.isPresenting) {
 				if (vrDisplay.capabilities.hasExternalDisplay) {
 					VRSamplesUtil.removeButton(vrPresentButton);
-					vrPresentButton = VRSamplesUtil.addButton("Exit VR", "E", "WebVR/media/icons/cardboard64.png", "vricon", onVRExitPresent);
+					vrPresentButton = VRSamplesUtil.addButton("Exit VR", "E", "media/icons/cardboard64.png", "vricon", onVRExitPresent);
 				}
 			} else {
 				if (vrDisplay.capabilities.hasExternalDisplay) {
 					VRSamplesUtil.removeButton(vrPresentButton);
-					vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "WebVR/media/icons/cardboard64.png", "vricon", onVRRequestPresent);
+					vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "media/icons/cardboard64.png", "vricon", onVRRequestPresent);
 				}
 			}
 		}
@@ -173,7 +173,7 @@ function init() {
 						vrDisplay.resetPose();
 					});
 					if (vrDisplay.capabilities.canPresent)
-						vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "WebVR/media/icons/cardboard64.png", "vricon", onVRRequestPresent);
+						vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "media/icons/cardboard64.png", "vricon", onVRRequestPresent);
 					window.addEventListener('vrdisplaypresentchange', onVRPresentChange, false);
 					window.addEventListener('vrdisplayactivate', onVRRequestPresent, false);
 					window.addEventListener('vrdisplaydeactivate', onVRExitPresent, false);
