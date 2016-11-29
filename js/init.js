@@ -260,7 +260,7 @@ function init() {
 							factor = 0.001;
 						}
 						
-						console.log("Pitch = " + camera.pitch + ", " + frameData.pose.orientation[0] * Math.PI + ", x = " + frameData.pose.orientation[0] + ", y = " + frameData.pose.orientation[1] + ", z = " + frameData.pose.orientation[2]);
+						//console.log("Pitch = " + camera.pitch + ", " + frameData.pose.orientation[0] * Math.PI + ", x = " + frameData.pose.orientation[0] + ", y = " + frameData.pose.orientation[1] + ", z = " + frameData.pose.orientation[2]);
 						//rotateX(-frameData.pose.orientation[0] * factor);
 						//rotateY(frameData.pose.orientation[1] * factor);
 						//rotateZ(frameData.pose.orientation[2] * factor);
@@ -269,9 +269,9 @@ function init() {
 						// you go upside down back to the horizontal at 1.0. For looking down start at 0 and go negative.
 						
 						//camera.lookRight(camera.pitch - (-Math.PI / 2 + frameData.pose.orientation[1] * Math.PI));
-						console.log("Pitch = " + camera.pitch + ", Headset pitch = " + frameData.pose.orientation[0] * Math.PI);
+						//console.log("Pitch = " + camera.pitch + ", Headset pitch = " + frameData.pose.orientation[0] * Math.PI);
 						var verticalAngle = -Math.PI / 2 + frameData.pose.orientation[0] * Math.PI;
-						console.log("Vertical angle = " + verticalAngle);
+						//console.log("Vertical angle = " + verticalAngle);
 						var horizontalAngle;
 						
 						if (frameData.pose.orientation[0] > 0) {
@@ -293,25 +293,14 @@ function init() {
 							camera.lookUp(camera.pitch - verticalAngle);
 						}
 						
-						/* console.log("Roll = " + camera.direction + ", Headset roll = " + frameData.pose.orientation[1] * Math.PI);
-						if (frameData.pose.orientation[1] > 0) {
-							// Looking up.
-							horizontalAngle = -Math.PI / 2 + frameData.pose.orientation[0] * Math.PI;
-							if (horizontalAngle > 0) {
-								horizontalAngle = 0;
-							}
-							
-							camera.lookRight(camera.roll - horizontalAngle);
-						}
+						
 						if (frameData.pose.orientation[1] < 0) {
-							// Looking down.
-							horizontalAngle = -Math.PI / 2 - frameData.pose.orientation[0] * Math.PI;
-							if (horizontalAngle > 0) {
-								horizontalAngle = 0;
-							}
-							
-							camera.lookLeft(camera.roll - horizontalAngle);
-						} */
+							// Looking in the horizontal plane
+							horizontalAngle = camera.direction.x - frameData.pose.orientation[1];
+						
+							console.log("Headset roll = " + frameData.pose.orientation[1] + ", camera position = " + camera.direction.x + ", offset by " + horizontalAngle);
+							camera.lookLeft(horizontalAngle);
+						}
 					}
 		
 					// Render the Cesium scene.
