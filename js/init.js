@@ -41,11 +41,12 @@ function init() {
 
 	viewer.scene.globe.depthTestAgainstTerrain = true;
 	
-	// The camera's X-axis. When looking at the globe rotating around this axis makes the view go up and down vertically.
+	// The camera's X-axis. When looking at the globe rotating around this axis makes the view go up and down vertically. That is, x points in the local east direction.
 	var xaxis = new Cesium.Cartesian3(1, 0, 0);
-	// The camera's Y-axis. When looking at the globe rotating around this axis makes the view go left and right horizontally.
+	// The camera's Y-axis. When looking at the globe rotating around this axis makes the view go left and right horizontally. That is, y points in the local north direction.
 	var yaxis = new Cesium.Cartesian3(0, 1, 0);
-	// The camera's Z-axis. When looking at the globe rotating around this axis makes the view go left and right horizontally ???? Empirical but I don't understand why.
+	// The camera's Z-axis. When looking at the globe rotating around this axis makes the view go left and right horizontally. That is, z points in the direction of the ellipsoid surface normal which passes through the position.
+	// See Transforms.eastNorthUpToFixedFrame(), which is the method used by Camera.look().
 	var zaxis = new Cesium.Cartesian3(0, 0, 1);
 	
 	function rotateX(amount) {
