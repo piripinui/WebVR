@@ -41,8 +41,11 @@ function init() {
 
 	viewer.scene.globe.depthTestAgainstTerrain = true;
 	
+	// The camera's X-axis. When looking at the globe rotating around this axis makes the view go up and down vertically.
 	var xaxis = new Cesium.Cartesian3(1, 0, 0);
+	// The camera's Y-axis. When looking at the globe rotating around this axis makes the view go left and right horizontally.
 	var yaxis = new Cesium.Cartesian3(0, 1, 0);
+	// The camera's Z-axis. When looking at the globe rotating around this axis makes the view go left and right horizontally ???? Empirical but I don't understand why.
 	var zaxis = new Cesium.Cartesian3(0, 0, 1);
 	
 	function rotateX(amount) {
