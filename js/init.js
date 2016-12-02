@@ -60,6 +60,10 @@ function init() {
 	function rotateZ(amount) {
 		viewer.scene.camera.rotate(zaxis, amount);
 	}
+	
+	function rad2deg(rad) {
+		return rad * (180 / Math.PI);
+	}
 
 	// Clone the frustum properties into our patched frustum object...
 	//var patchedFrustum = viewer.scene.camera.frustum.clone(new PerspectiveFrustumPatch());
@@ -238,7 +242,7 @@ function init() {
 					// The pose is your position in the room?
 					//console.log(frameData.pose.position);
 					// Pose orientation is where the egadset is looking?
-					console.log(frameData.pose.orientation);
+					//console.log(frameData.pose.orientation);
 					
 					if (rdiff < 0) {
 						//viewer.camera.rotateUp(frameData.pose.orientation[0]);
@@ -293,14 +297,46 @@ function init() {
 							camera.lookUp(camera.pitch - verticalAngle);
 						}
 						
+						var camDelta;
 						
-						if (frameData.pose.orientation[1] < 0) {
-							// Looking in the horizontal plane
-							horizontalAngle = camera.direction.x - frameData.pose.orientation[1];
-						
-							console.log("Headset roll = " + frameData.pose.orientation[1] + ", camera position = " + camera.direction.x + ", offset by " + horizontalAngle);
-							camera.lookLeft(horizontalAngle);
+						if (frameData.pose.orientation[1] <= -0.5 && frameData.pose.orientation[1] >= -1) {
+							// SW quadrant. -0.5 = PI, -1 = 3/2 PI.
+							horizontalAngle = Math.PI / 2 - (frameData.pose.orientation[1] * Math.PI);
 						}
+						if (frameData.pose.orientation[1] > 0.5 && frameData.pose.orientation[1] <= 1.0) {
+							// NW quadrant. 0.5 = 2PI, 1 = 3/2PI.
+							horizontalAngle = 5/2 * Math.PI - (frameData.pose.orientation[1] * Math.PI);
+						}
+						if (frameData.pose.orientation[1] > 0.0 && frameData.pose.orientation[1] <= 0.5) {
+							// NE quadrant. 0 = PI/2, 0.5 = 0.
+							horizontalAngle = Math.PI / 2 - (frameData.pose.orientation[1] * Math.PI);
+						}
+						if (frameData.pose.orientation[1] < 0.0 && frameData.pose.orientation[1] >= -0.5) {
+							// SE quadrant. 0 = PI/2, -0.5 = PI.
+							horizontalAngle = Math.PI / 2 - (frameData.pose.orientation[1] * Math.PI);
+						}
+						
+							
+						camDelta = camera.heading - horizontalAngle;												
+						
+						var chDegrees = rad2deg(camera.heading);
+						var hsDegrees = rad2deg(horizontalAngle);
+						var cdDegrees = rad2deg(camDelta);
+
+						
+						if (camera.heading > horizontalAngle) {
+							var intV = camDelta / 100;
+							
+							for (var i = 0; i < 100; i++) {
+								camera.lookLeft(intV);
+							}
+						}
+						else {
+							camera.lookRight(Math.abs(camDelta));
+						}
+						
+						console.log("Headset = " + frameData.pose.orientation[1] + ", camera heading = " + camera.heading + ", (" + rad2deg(camera.heading) + "), headset angle = " + horizontalAngle + " (" + rad2deg(horizontalAngle) + "). " + camDelta);
+
 					}
 		
 					// Render the Cesium scene.
