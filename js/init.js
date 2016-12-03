@@ -41,13 +41,16 @@ function init() {
 
 	viewer.scene.globe.depthTestAgainstTerrain = true;
 	
+	var camera = viewer.scene.camera;
+	var lastLeftRight;
+	
 	// The camera's X-axis. When looking at the globe rotating around this axis makes the view go up and down vertically. That is, x points in the local east direction.
-	var xaxis = new Cesium.Cartesian3(1, 0, 0);
+	var xaxis = new Cesium.Cartesian3(camera.position.x, 0, 0);
 	// The camera's Y-axis. When looking at the globe rotating around this axis makes the view go left and right horizontally. That is, y points in the local north direction.
-	var yaxis = new Cesium.Cartesian3(0, 1, 0);
+	var yaxis = new Cesium.Cartesian3(0, camera.position.y, 0);
 	// The camera's Z-axis. When looking at the globe rotating around this axis makes the view go left and right horizontally. That is, z points in the direction of the ellipsoid surface normal which passes through the position.
 	// See Transforms.eastNorthUpToFixedFrame(), which is the method used by Camera.look().
-	var zaxis = new Cesium.Cartesian3(0, 0, 1);
+	var zaxis = new Cesium.Cartesian3(0, 0, camera.position.z);
 	
 	function rotateX(amount) {
 		viewer.scene.camera.rotate(xaxis, amount);
@@ -64,6 +67,8 @@ function init() {
 	function rad2deg(rad) {
 		return rad * (180 / Math.PI);
 	}
+	
+	var headingAdjust, pitchAdjust, rollAdjust;
 
 	// Clone the frustum properties into our patched frustum object...
 	//var patchedFrustum = viewer.scene.camera.frustum.clone(new PerspectiveFrustumPatch());
@@ -222,6 +227,18 @@ function init() {
 				webglCanvas.height = webglCanvas.offsetHeight * window.devicePixelRatio;
 			}
 		}
+		
+		function horizontalDirectionAngle() {
+			var xdelta = camera.position.x - camera.direction.x;
+			var ydelta = camera.position.y - camera.direction.y;
+			var d = Math.sqrt(xdelta * xdelta + ydelta * ydelta);
+			var directionAngle = Math.asin(Math.abs(ydelta) / d);
+			
+			console.log("Direction angle = " + directionAngle + " (" + rad2deg(directionAngle) + " degrees), " + xdelta + ", " + ydelta + ", " + camera.position.x + ", " + camera.direction.x);
+			
+			return directionAngle;
+		}
+			
 		function onAnimationFrame(t) {
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -237,6 +254,10 @@ function init() {
 					var r = Math.sqrt(x * x + y * y + z * z);
 					var h = viewer.scene.globe.getHeight(camera.positionCartographic);
 					var rdiff = r - Cesium.Ellipsoid.WGS84.maximumRadius;
+					
+					xaxis = new Cesium.Cartesian3(camera.position.x, 0, 0);
+					yaxis = new Cesium.Cartesian3(0, camera.position.y, 0);
+					zaxis = new Cesium.Cartesian3(0, 0, camera.position.z);
 					//console.log("Height = " + h + " (" + x + ", " + y + ", " + z + ", r = " + r + ", rdiff = " + rdiff + ")");
 			
 					// The pose is your position in the room?
@@ -274,18 +295,18 @@ function init() {
 						
 						//camera.lookRight(camera.pitch - (-Math.PI / 2 + frameData.pose.orientation[1] * Math.PI));
 						//console.log("Pitch = " + camera.pitch + ", Headset pitch = " + frameData.pose.orientation[0] * Math.PI);
-						var verticalAngle = -Math.PI / 2 + frameData.pose.orientation[0] * Math.PI;
-						//console.log("Vertical angle = " + verticalAngle);
-						var horizontalAngle;
+
 						
-						if (frameData.pose.orientation[0] > 0) {
+						var hmdPitch = frameData.pose.orientation[0] * Math.PI;
+						
+						/* if (frameData.pose.orientation[0] > 0) {
 							// Looking up.
 							verticalAngle = -Math.PI / 2 + frameData.pose.orientation[0] * Math.PI;
 							if (verticalAngle > 0) {
 								verticalAngle = 0;
 							}
 							
-							camera.lookDown(camera.pitch - verticalAngle);
+							//camera.lookDown(camera.pitch - verticalAngle);
 						}
 						if (frameData.pose.orientation[0] < 0) {
 							// Looking down.
@@ -294,48 +315,64 @@ function init() {
 								verticalAngle = 0;
 							}
 							
-							camera.lookUp(camera.pitch - verticalAngle);
-						}
+							//camera.lookUp(camera.pitch - verticalAngle);
+						} */
 						
 						var camDelta;
 						
-						if (frameData.pose.orientation[1] <= -0.5 && frameData.pose.orientation[1] >= -1) {
-							// SW quadrant. -0.5 = PI, -1 = 3/2 PI.
-							horizontalAngle = Math.PI / 2 - (frameData.pose.orientation[1] * Math.PI);
-						}
-						if (frameData.pose.orientation[1] > 0.5 && frameData.pose.orientation[1] <= 1.0) {
-							// NW quadrant. 0.5 = 2PI, 1 = 3/2PI.
-							horizontalAngle = 5/2 * Math.PI - (frameData.pose.orientation[1] * Math.PI);
-						}
-						if (frameData.pose.orientation[1] > 0.0 && frameData.pose.orientation[1] <= 0.5) {
-							// NE quadrant. 0 = PI/2, 0.5 = 0.
-							horizontalAngle = Math.PI / 2 - (frameData.pose.orientation[1] * Math.PI);
-						}
-						if (frameData.pose.orientation[1] < 0.0 && frameData.pose.orientation[1] >= -0.5) {
-							// SE quadrant. 0 = PI/2, -0.5 = PI.
-							horizontalAngle = Math.PI / 2 - (frameData.pose.orientation[1] * Math.PI);
-						}
+						function calculateAngle(index) {
+							var angle;
 						
-							
-						camDelta = camera.heading - horizontalAngle;												
-						
-						var chDegrees = rad2deg(camera.heading);
-						var hsDegrees = rad2deg(horizontalAngle);
-						var cdDegrees = rad2deg(camDelta);
-
-						
-						if (camera.heading > horizontalAngle) {
-							var intV = camDelta / 100;
-							
-							for (var i = 0; i < 100; i++) {
-								camera.lookLeft(intV);
+							if (frameData.pose.orientation[index] <= -0.5 && frameData.pose.orientation[index] >= -1) {
+								// SW quadrant. -0.5 = PI, -1 = 3/2 PI.
+								angle = Math.PI / 2 - (frameData.pose.orientation[index] * Math.PI);
 							}
-						}
-						else {
-							camera.lookRight(Math.abs(camDelta));
+							if (frameData.pose.orientation[index] > 0.5 && frameData.pose.orientation[index] <= 1.0) {
+								// NW quadrant. 0.5 = 2PI, 1 = 3/2PI.
+								angle = 5/2 * Math.PI - (frameData.pose.orientation[index] * Math.PI);
+							}
+							if (frameData.pose.orientation[index] > 0.0 && frameData.pose.orientation[index] <= 0.5) {
+								// NE quadrant. 0 = PI/2, 0.5 = 0.
+								angle = Math.PI / 2 - (frameData.pose.orientation[index] * Math.PI);
+							}
+							if (frameData.pose.orientation[index] < 0.0 && frameData.pose.orientation[index] >= -0.5) {
+								// SE quadrant. 0 = PI/2, -0.5 = PI.
+								angle = Math.PI / 2 - (frameData.pose.orientation[index] * Math.PI);
+							}
+							
+							return angle;
 						}
 						
-						console.log("Headset = " + frameData.pose.orientation[1] + ", camera heading = " + camera.heading + ", (" + rad2deg(camera.heading) + "), headset angle = " + horizontalAngle + " (" + rad2deg(horizontalAngle) + "). " + camDelta);
+						//var hmdPitch = calculateAngle(0);
+						var hmdHeading = calculateAngle(1);
+						var hmdRoll = calculateAngle(2);
+						
+						
+						if (!lastLeftRight) {
+							lastLeftRight = hmdHeading;
+						}
+
+						if (!pitchAdjust) {
+							pitchAdjust = camera.pitch - hmdPitch;
+						}
+							
+						
+						if (!isNaN(hmdHeading) && !isNaN(hmdPitch) && !isNaN(hmdRoll)) {
+							console.log("Heading = " + rad2deg(hmdHeading) + ", Camera heading= " + rad2deg(camera.heading));
+							camera.setView({
+								orientation: {
+									pitch: hmdPitch + pitchAdjust
+								}
+							});
+						
+						}
+						
+						var diff = hmdHeading - lastLeftRight;
+						
+						camera.lookRight(diff);
+						
+						//console.log("Headset = " + frameData.pose.orientation[1] + ", camera direction = " + ang + ", (" + rad2deg(ang) + "), headset angle = " + horizontalAngle + " (" + rad2deg(horizontalAngle) + "), " + hmdRoll);
+
 
 					}
 		
