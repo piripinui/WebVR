@@ -4,6 +4,7 @@ globalFo=6371172.35,
 //globalFocalLength = -160000000;
 globalFocalLength = -5000000,
 projNear = 1, projFar = 500000000,
+eyeSeperationDenominator = 20,
 lastGoodHeight,
 locations = {
 	denver: new Cesium.Cartesian3(-1272209.292469148, -4751630.941108344, 4063428.939909443),
@@ -21,7 +22,10 @@ function gotoLocation(location) {
 
 function flytoLocation(location) {
 	viewer.scene.camera.flyTo({
-		destination: locations[location]
+		destination: locations[location],
+		orientation: {
+			pitch: 0.0
+		}
 	});
 }
 
@@ -42,7 +46,7 @@ function init() {
 	viewer.scene.globe.depthTestAgainstTerrain = true;
 	
 	var camera = viewer.scene.camera;
-	var lastLeftRight;
+	var lastLeftRight, lastUpDown;
 	
 	// The camera's X-axis. When looking at the globe rotating around this axis makes the view go up and down vertically. That is, x points in the local east direction.
 	var xaxis = new Cesium.Cartesian3(camera.position.x, 0, 0);
@@ -152,6 +156,8 @@ function init() {
 				]).then(function () {}, function () {
 				VRSamplesUtil.addError("requestPresent failed.", 2000);
 			});
+			
+			camera.flyHome();
 		}
 		function onVRExitPresent() {
 			if (!vrDisplay.isPresenting)
@@ -193,6 +199,8 @@ function init() {
 					// Only use preserveDrawingBuffer if we have an external display to
 					// mirror to.
 					initWebGL(vrDisplay.capabilities.hasExternalDisplay);
+					
+					console.log(navigator.getGamepads());
 				} else {
 					initWebGL(false);
 					VRSamplesUtil.addInfo("WebVR supported, but no VRDisplays found.", 3000);
@@ -248,77 +256,9 @@ function init() {
 				if (vrDisplay.isPresenting) {
 					var camera = viewer.scene.camera;
 					
-					var x = camera.position.x;
-					var y = camera.position.y;
-					var z = camera.position.z;
-					var r = Math.sqrt(x * x + y * y + z * z);
-					var h = viewer.scene.globe.getHeight(camera.positionCartographic);
-					var rdiff = r - Cesium.Ellipsoid.WGS84.maximumRadius;
-					
-					xaxis = new Cesium.Cartesian3(camera.position.x, 0, 0);
-					yaxis = new Cesium.Cartesian3(0, camera.position.y, 0);
-					zaxis = new Cesium.Cartesian3(0, 0, camera.position.z);
-					//console.log("Height = " + h + " (" + x + ", " + y + ", " + z + ", r = " + r + ", rdiff = " + rdiff + ")");
-			
-					// The pose is your position in the room?
-					//console.log(frameData.pose.position);
-					// Pose orientation is where the egadset is looking?
-					//console.log(frameData.pose.orientation);
-					
-					if (rdiff < 0) {
-						//viewer.camera.rotateUp(frameData.pose.orientation[0]);
-						//viewer.camera.rotateRight(frameData.pose.orientation[1]);
-					}
-					
 					if (frameData.pose && frameData.pose.orientation) {
 						// Move the camera around according to your headset position i.e. the head moves will scroll the map.
 						// The pose can be null if you lose tracking.
-						var factor;
-						
-						if (h > 10000) {
-							factor = 100;
-						}
-						if (h > 900 && h <= 10000) {
-							factor = 0.01;
-						}
-						else {
-							factor = 0.001;
-						}
-						
-						//console.log("Pitch = " + camera.pitch + ", " + frameData.pose.orientation[0] * Math.PI + ", x = " + frameData.pose.orientation[0] + ", y = " + frameData.pose.orientation[1] + ", z = " + frameData.pose.orientation[2]);
-						//rotateX(-frameData.pose.orientation[0] * factor);
-						//rotateY(frameData.pose.orientation[1] * factor);
-						//rotateZ(frameData.pose.orientation[2] * factor);
-						
-						// frameData.pose.orientation[0] represents the vertical axis. 0 is straight ahead and moving up is postive. 90 degrees is half way i.e. 0.5, until
-						// you go upside down back to the horizontal at 1.0. For looking down start at 0 and go negative.
-						
-						//camera.lookRight(camera.pitch - (-Math.PI / 2 + frameData.pose.orientation[1] * Math.PI));
-						//console.log("Pitch = " + camera.pitch + ", Headset pitch = " + frameData.pose.orientation[0] * Math.PI);
-
-						
-						var hmdPitch = frameData.pose.orientation[0] * Math.PI;
-						
-						/* if (frameData.pose.orientation[0] > 0) {
-							// Looking up.
-							verticalAngle = -Math.PI / 2 + frameData.pose.orientation[0] * Math.PI;
-							if (verticalAngle > 0) {
-								verticalAngle = 0;
-							}
-							
-							//camera.lookDown(camera.pitch - verticalAngle);
-						}
-						if (frameData.pose.orientation[0] < 0) {
-							// Looking down.
-							verticalAngle = -Math.PI / 2 - frameData.pose.orientation[0] * Math.PI;
-							if (verticalAngle > 0) {
-								verticalAngle = 0;
-							}
-							
-							//camera.lookUp(camera.pitch - verticalAngle);
-						} */
-						
-						var camDelta;
 						
 						function calculateAngle(index) {
 							var angle;
@@ -343,13 +283,16 @@ function init() {
 							return angle;
 						}
 						
-						//var hmdPitch = calculateAngle(0);
+						var hmdPitch = calculateAngle(0);
 						var hmdHeading = calculateAngle(1);
 						var hmdRoll = calculateAngle(2);
 						
 						
 						if (!lastLeftRight) {
 							lastLeftRight = hmdHeading;
+						}
+						if (!lastUpDown) {
+							lastUpDown = hmdPitch;
 						}
 
 						if (!pitchAdjust) {
@@ -358,18 +301,17 @@ function init() {
 							
 						
 						if (!isNaN(hmdHeading) && !isNaN(hmdPitch) && !isNaN(hmdRoll)) {
-							console.log("Heading = " + rad2deg(hmdHeading) + ", Camera heading= " + rad2deg(camera.heading));
-							camera.setView({
-								orientation: {
-									pitch: hmdPitch + pitchAdjust
-								}
-							});
+							//console.log("Heading = " + rad2deg(hmdHeading) + ", Camera heading= " + rad2deg(camera.heading));
+
+							var hdiff = hmdHeading - lastLeftRight;
+							var vdiff = hmdPitch - lastUpDown;
 						
+							camera.lookRight(hdiff);
+							camera.lookDown(vdiff);
+							
+							lastUpDown = hmdPitch;
+							lastLeftRight = hmdHeading;
 						}
-						
-						var diff = hmdHeading - lastLeftRight;
-						
-						camera.lookRight(diff);
 						
 						//console.log("Headset = " + frameData.pose.orientation[1] + ", camera direction = " + ang + ", (" + rad2deg(ang) + "), headset angle = " + horizontalAngle + " (" + rad2deg(horizontalAngle) + "), " + hmdRoll);
 
