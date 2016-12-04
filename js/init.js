@@ -283,12 +283,7 @@ function init() {
 						if (!lastUpDown) {
 							lastUpDown = hmdPitch;
 						}
-
-						if (!pitchAdjust) {
-							pitchAdjust = camera.pitch - hmdPitch;
-						}
-							
-						
+												
 						if (!isNaN(hmdHeading) && !isNaN(hmdPitch) && !isNaN(hmdRoll)) {
 							//console.log("Heading = " + rad2deg(hmdHeading) + ", Camera heading= " + rad2deg(camera.heading));
 
@@ -303,8 +298,18 @@ function init() {
 						}
 						
 						//console.log("Headset = " + frameData.pose.orientation[1] + ", camera direction = " + ang + ", (" + rad2deg(ang) + "), headset angle = " + horizontalAngle + " (" + rad2deg(horizontalAngle) + "), " + hmdRoll);
-
-
+					}
+					
+					vrGamepads = [];
+					getVRGamepads();
+					
+					if (vrGamepads) {
+					    if (vrGamepads[0]) {
+							console.log(vrGamepads[0].pose.position);
+						}
+						if (vrGamepads[1]) {
+							console.log(vrGamepads[1].pose.position + vrGamepads[1].pose.orientation);
+						}
 					}
 		
 					// Render the Cesium scene.
@@ -325,6 +330,134 @@ function init() {
 				viewer.render();
 				//stats.renderOrtho();
 			}
+		}
+		
+		var makeGamepadTracker = function (scene, gamepadIndex, buttonHandler) {
+			
+			var trk = function (drawable, timePoint) {
+				// console.log('hi!');
+				var vrGamepads = getVRGamepads();
+				// console.log('Got ', vrGamepads.length, 'VR gamepads from ', gamepads.length, 'total gamepads');
+				if (vrGamepads.length && vrGamepads[gamepadIndex]) {
+					var myGp = vrGamepads[gamepadIndex];
+					var gPose = myGp.pose;
+					if (!(gPose && gPose.orientation && gPose.position)) return; /* Pose is missing or incomplete, not much we can do! */
+					var gpMat = mat4.create();
+					// var orientation = gPose.orientation;
+					// var position = gPose.
+					if (window.vrDisplay.stageParameters) {
+						mat4.fromRotationTranslation(gpMat, gPose.orientation, gPose.position);
+						mat4.multiply(gpMat, vrDisplay.stageParameters.sittingToStandingTransform, gpMat);
+						
+						var ploc = scene.playerLocation;
+						var trans = vec3.fromValues(ploc.x, ploc.y, ploc.z);
+						var reloc = mat4.create();
+						mat4.fromTranslation(reloc, trans);
+						mat4.mul(gpMat, reloc, gpMat);
+						
+					}
+					for (var btnIdx=0; btnIdx<myGp.buttons.length; btnIdx++) {
+						var scratchPadKey = 'Button' + btnIdx + 'Down';
+						var prevState = drawable.scratchPad[scratchPadKey] || false;
+						var myButton = myGp.buttons[btnIdx];
+						var buttonStatus = (myButton.pressed ? 'down' : 'up');
+						if (myButton.pressed != prevState) {
+							// console.debug(myGp);
+							buttonStatus = (myButton.pressed ? 'pressed' : 'released')
+							drawable.scratchPad[scratchPadKey] = myButton.pressed;
+							// console.log('Button ', btnIdx, buttonStatus, 'on gamepad', gamepadIndex);
+						}
+						else if (myButton.pressed) {
+							buttonStatus = 'held';
+							// console.log('Button ', btnIdx, buttonStatus, 'on gamepad', gamepadIndex);
+						}
+						
+						drawable.scratchPad['trackpadAxes'] = myGp.axes;
+						if (btnIdx == 0 && myButton.touched) {
+							var sector;
+							// var a = myGp.axes[0]<0,
+							//     b = myGp.axes[0]>0,
+							//     c = myGp.axes[1]<0,
+							//     d = myGp.axes[1]>0;
+							var a = -0.5 < myGp.axes[0] < 0.5, 
+								b = myGp.axes[0] < -0.5 || myGp.axes[0] > 0.5, 
+								c = -0.5 < myGp.axes[1] < 0.5, 
+								d = myGp.axes[1] < -0.5 || myGp.axes[1] > 0.5;
+							if (!a && !b && !c && !d) {
+								sector = 'center';
+							}
+							else if (!a && !b && c && d) {
+								sector = 's';
+							}
+							else if (a && b && c && d) {
+								sector = 'sw';
+							}
+							else if (a && b && !c && !d) {
+								sector = 'w';
+							}
+							else if (a && b && !c && d) {
+								sector = 'nw';
+							}
+							else if (!a && !b && !c && d) {
+								sector = 'n';
+							}
+							else if (!a && b && !c && d) {
+								sector = 'ne';
+							}
+							else if (!a && b && !c && !d) {
+								sector = 'e';
+							}
+							else if (!a && b && c && d) {
+								sector = 'se';
+							}
+							drawable.scratchPad['trackpadSector'] = sector;
+							// console.log(sector);
+						}
+						
+						if (buttonHandler) {
+							var extra = {drawable: drawable, gamepad: myGp, sector: sector, buttonRaw: myButton};
+							buttonHandler(gamepadIndex, btnIdx, buttonStatus, sector, myButton, extra);
+						}
+						
+					}
+					// drawable.pos = {x:gPose.position[0], y:gPose.position[1], z:gPose.position[2]};
+					// drawable.orientation = {x:gPose.orientation[0], y:gPose.orientation[1], z:gPose.orientation[2]};
+					if (drawable.rotation || drawable.translation) {
+						// console.log(drawable.orientation);
+						// var finalMatrix = mat4.create(finalMatrix);
+						var ori = drawable.rotation || {x:0, y:0, z:0};
+						var tra = drawable.translation || {x:0, y:0, z:0};
+						// var finalMatrix = mat4.create();
+						// mat4.copy(finalMatrix, gpMat);
+						// mat4.rotateX(finalMatrix, finalMatrix, ori.x);
+						// mat4.rotateY(finalMatrix, finalMatrix, ori.y);
+						// mat4.rotateZ(finalMatrix, finalMatrix, ori.z);
+						// drawable.matrix = finalMatrix;
+						
+						var transmat = mat4.create();
+						var finalmat = mat4.create();
+						var rot = quat.create();
+						quat.rotateX(rot, rot, ori.x);
+						quat.rotateY(rot, rot, ori.y);
+						quat.rotateZ(rot, rot, ori.z);
+						var trl = vec3.fromValues(tra.x, tra.y, tra.z);
+						mat4.fromRotationTranslation(transmat, rot, trl);
+						mat4.mul(finalmat, gpMat, transmat);
+						drawable.matrix = finalmat;
+					}
+						
+					//     mat4.mul(finalMatrix, gpMat, drawable.orientation);
+					//     drawable.matrix = finalMatrix;
+					//
+					// }
+					else {
+						drawable.matrix = gpMat;
+						
+					}
+				}
+			}
+			return trk;
+			
 		}
 	})();
 };
