@@ -9,7 +9,8 @@ lastGoodHeight,
 locations = {
 	denver: new Cesium.Cartesian3(-1272209.292469148, -4751630.941108344, 4063428.939909443),
 	redrocks: new Cesium.Cartesian3(-1289792.3587257643, -4746245.525598164, 4051013.2689858945)
-};
+},
+vrGamepads = [];;
 
 function newWindowRetest() {
  winRef = window.open(''+self.location,'mywin',
@@ -135,7 +136,6 @@ function init() {
 			window.requestAnimationFrame(onAnimationFrame);
 		}
 		function getVRGamepads(poseOptional) {
-			var vrGamepads = [];
 			var gamepads = navigator.getGamepads();
 			for (var i=0; i<gamepads.length; i++) {
 				var gamepad = gamepads[i];
