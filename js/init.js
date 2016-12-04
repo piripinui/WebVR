@@ -134,6 +134,18 @@ function init() {
 			onResize();
 			window.requestAnimationFrame(onAnimationFrame);
 		}
+		function getVRGamepads(poseOptional) {
+			var vrGamepads = [];
+			var gamepads = navigator.getGamepads();
+			for (var i=0; i<gamepads.length; i++) {
+				var gamepad = gamepads[i];
+				if (gamepad && gamepad.id == 'OpenVR Gamepad' && (gamepad.pose || poseOptional)) {
+					console.log("Got a controller..." + gamepad);
+					vrGamepads.push(gamepad);
+				}
+			}
+			return vrGamepads;
+		}
 		function onVRRequestPresent() {
 			// PJR need to resize window first so that it matches the size of the HMD eyes.
 			var leftEye = vrDisplay.getEyeParameters("left");
@@ -153,9 +165,13 @@ function init() {
 			vrDisplay.requestPresent([{
 						source: webglCanvas
 					}
-				]).then(function () {}, function () {
+				]).then(function () {
+					getVRGamepads();
+				}, function () {
 				VRSamplesUtil.addError("requestPresent failed.", 2000);
 			});
+			
+								
 			
 			camera.flyHome();
 		}
@@ -199,8 +215,6 @@ function init() {
 					// Only use preserveDrawingBuffer if we have an external display to
 					// mirror to.
 					initWebGL(vrDisplay.capabilities.hasExternalDisplay);
-					
-					console.log(navigator.getGamepads());
 				} else {
 					initWebGL(false);
 					VRSamplesUtil.addInfo("WebVR supported, but no VRDisplays found.", 3000);
