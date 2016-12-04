@@ -8,7 +8,8 @@ eyeSeperationDenominator = 20,
 lastGoodHeight,
 locations = {
 	denver: new Cesium.Cartesian3(-1272209.292469148, -4751630.941108344, 4063428.939909443),
-	redrocks: new Cesium.Cartesian3(-1289792.3587257643, -4746245.525598164, 4051013.2689858945)
+	redrocks: new Cesium.Cartesian3(-1289792.3587257643, -4746245.525598164, 4051013.2689858945),
+	controller: Cesium.Cartesian3.fromDegrees(-75.62898254394531, 40.02804946899414, 0.0)
 },
 vrGamepads = [];;
 
@@ -47,28 +48,10 @@ function init() {
 	viewer.scene.globe.depthTestAgainstTerrain = true;
 	
 	var camera = viewer.scene.camera;
+	var viveControllerModel;
 	var lastLeftRight, lastUpDown;
-	
-	// The camera's X-axis. When looking at the globe rotating around this axis makes the view go up and down vertically. That is, x points in the local east direction.
-	var xaxis = new Cesium.Cartesian3(camera.position.x, 0, 0);
-	// The camera's Y-axis. When looking at the globe rotating around this axis makes the view go left and right horizontally. That is, y points in the local north direction.
-	var yaxis = new Cesium.Cartesian3(0, camera.position.y, 0);
-	// The camera's Z-axis. When looking at the globe rotating around this axis makes the view go left and right horizontally. That is, z points in the direction of the ellipsoid surface normal which passes through the position.
-	// See Transforms.eastNorthUpToFixedFrame(), which is the method used by Camera.look().
-	var zaxis = new Cesium.Cartesian3(0, 0, camera.position.z);
-	
-	function rotateX(amount) {
-		viewer.scene.camera.rotate(xaxis, amount);
-	}
-	
-	function rotateY(amount) {
-		viewer.scene.camera.rotate(yaxis, amount);
-	}
-	
-	function rotateZ(amount) {
-		viewer.scene.camera.rotate(zaxis, amount);
-	}
-	
+
+		
 	function rad2deg(rad) {
 		return rad * (180 / Math.PI);
 	}
@@ -126,7 +109,34 @@ function init() {
 			for (var i=0; i<gamepads.length; i++) {
 				var gamepad = gamepads[i];
 				if (gamepad && gamepad.id == 'OpenVR Gamepad' && (gamepad.pose || poseOptional)) {
-					console.log("Got a controller..." + gamepad);
+					//console.log("Got a controller..." + gamepad);
+					
+					if (gamepad.pose.position) {
+						var cartPos = camera.positionCartographic;
+						var newPos = Cesium.Cartesian3.fromDegrees(rad2deg(cartPos.longitude), rad2deg(cartPos.latitude), cartPos.height - 10);
+						var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(newPos);
+						
+						// Load the Vive controller model.
+						if (!viveControllerModel) {
+							console.log("Loading the Vive controller model...");
+		
+							
+							viveControllerModel = viewer.scene.primitives.add(Cesium.Model.fromGltf({
+								url : 'models/Vive_Controller_Body.glb',
+								modelMatrix : modelMatrix,
+								scale : 1.0
+							}));
+						}
+						else {
+							// Change the existing model's position.
+							
+						}
+						
+						/* camera.flyTo({
+							destination: newPos
+						}); */
+					}
+					
 					vrGamepads.push(gamepad);
 				}
 			}
@@ -305,10 +315,10 @@ function init() {
 					
 					if (vrGamepads) {
 					    if (vrGamepads[0]) {
-							console.log(vrGamepads[0].pose.position);
+							//console.log(vrGamepads[0].pose.position);
 						}
 						if (vrGamepads[1]) {
-							console.log(vrGamepads[1].pose.position + vrGamepads[1].pose.orientation);
+							//console.log(vrGamepads[1].pose.position + vrGamepads[1].pose.orientation);
 						}
 					}
 		
