@@ -73,20 +73,6 @@ function init() {
 		return rad * (180 / Math.PI);
 	}
 	
-	var headingAdjust, pitchAdjust, rollAdjust;
-
-	// Clone the frustum properties into our patched frustum object...
-	//var patchedFrustum = viewer.scene.camera.frustum.clone(new PerspectiveFrustumPatch());
-	// Patch the camera frustum prototype...
-	//viewer.scene.camera.frustum = patchedFrustum;
-
-
-	//cesiumVR = new CesiumVR(1000000000.0, run);
-
-	//var patchedFrustum = viewer.scene.camera.frustum.clone(new PerspectiveFrustumPatch());
-	//viewer.scene.camera.frustum = patchedFrustum;
-
-	/* global mat4, VRCubeSea, WGLUStats, WGLUTextureLoader, VRSamplesUtil */
 	(function () {
 		"use strict";
 		var vrDisplay = null;
@@ -249,18 +235,7 @@ function init() {
 				webglCanvas.height = webglCanvas.offsetHeight * window.devicePixelRatio;
 			}
 		}
-		
-		function horizontalDirectionAngle() {
-			var xdelta = camera.position.x - camera.direction.x;
-			var ydelta = camera.position.y - camera.direction.y;
-			var d = Math.sqrt(xdelta * xdelta + ydelta * ydelta);
-			var directionAngle = Math.asin(Math.abs(ydelta) / d);
-			
-			console.log("Direction angle = " + directionAngle + " (" + rad2deg(directionAngle) + " degrees), " + xdelta + ", " + ydelta + ", " + camera.position.x + ", " + camera.direction.x);
-			
-			return directionAngle;
-		}
-			
+					
 		function onAnimationFrame(t) {
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
