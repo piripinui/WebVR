@@ -47,6 +47,15 @@ function init() {
 
 	viewer.scene.globe.depthTestAgainstTerrain = true;
 	
+	var span = document.createElement('span');
+	span.style.position = 'absolute';
+	span.style.top = '10px';
+	span.style.left = '10px';
+	span.style.color = "white";
+	span.style["z-index"] = '999';
+	span.textContent = "Debug";
+	viewer.container.appendChild(span);
+	
 	var camera = viewer.scene.camera;
 	var viveControllerModel;
 	var lastLeftRight, lastUpDown;
@@ -306,6 +315,8 @@ function init() {
 							lastUpDown = hmdPitch;
 							lastLeftRight = hmdHeading;
 						}
+						
+						span.textContent = "Headset = " + frameData.pose.orientation[1] + ", camera direction = " + ang + ", (" + rad2deg(ang) + "), headset angle = " + horizontalAngle + " (" + rad2deg(horizontalAngle) + "), " + hmdRoll;
 						
 						//console.log("Headset = " + frameData.pose.orientation[1] + ", camera direction = " + ang + ", (" + rad2deg(ang) + "), headset angle = " + horizontalAngle + " (" + rad2deg(horizontalAngle) + "), " + hmdRoll);
 					}
