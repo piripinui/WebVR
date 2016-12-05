@@ -314,11 +314,8 @@ function init() {
 							
 							lastUpDown = hmdPitch;
 							lastLeftRight = hmdHeading;
+							span.textContent = "Heading = " + rad2deg(hmdHeading) + ", Camera heading= " + rad2deg(camera.heading);
 						}
-						
-						span.textContent = "Headset = " + frameData.pose.orientation[1] + ", camera direction = " + ang + ", (" + rad2deg(ang) + "), headset angle = " + horizontalAngle + " (" + rad2deg(horizontalAngle) + "), " + hmdRoll;
-						
-						//console.log("Headset = " + frameData.pose.orientation[1] + ", camera direction = " + ang + ", (" + rad2deg(ang) + "), headset angle = " + horizontalAngle + " (" + rad2deg(horizontalAngle) + "), " + hmdRoll);
 					}
 					
 					vrGamepads = [];
