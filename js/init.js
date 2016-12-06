@@ -61,6 +61,9 @@ function init() {
 	var lastLeftRight, lastUpDown;
 
 	var lookQ = async.queue(function(task, callback) {
+		// Pulls "look" tasks off the queue and sends them to the camera at certain intervals.
+		// Intended to try and avoid weird sideeffects when look movements are sent to the camera
+		// very quickly, specifically that the camera's orientation starts to rotate.
 		switch(task.type) {
 			case "left": {
 				window.setTimeout(function() {
