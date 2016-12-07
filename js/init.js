@@ -10,9 +10,12 @@ locations = {
 	denver: new Cesium.Cartesian3(-1272209.292469148, -4751630.941108344, 4063428.939909443),
 	redrocks: new Cesium.Cartesian3(-1289792.3587257643, -4746245.525598164, 4051013.2689858945),
 	controller: Cesium.Cartesian3.fromDegrees(-75.62898254394531, 40.02804946899414, 0.0),
-	denver_downtown: Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 10000)
+	denver_downtown: Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 10000),
+	denver_downtown_tight: Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 2500)
 },
-vrGamepads = [];;
+vrGamepads = [],
+heightAtCameraPosition,
+eyeSeparationOverride;
 
 function newWindowRetest() {
  winRef = window.open(''+self.location,'mywin',
@@ -24,11 +27,22 @@ function gotoLocation(location) {
 }
 
 function flytoLocation(location) {
-	viewer.scene.camera.flyTo({
-		destination: locations[location],
-		orientation: {
-			pitch: 0.0
-		}
+	var camera = viewer.scene.camera;
+	var terrainProvider = viewer.terrainProvider;
+	var posCarto = Cesium.Cartographic.fromCartesian(locations[location]);
+	var positions = [
+		posCarto
+	];
+	var promise = Cesium.sampleTerrain(terrainProvider, 11, positions);
+	Cesium.when(promise, function(updatedPositions) {
+		heightAtCameraPosition = updatedPositions[0].height;
+		
+		viewer.scene.camera.flyTo({
+			destination: locations[location],
+			orientation: {
+				pitch: 0.0
+			}
+		});
 	});
 }
 
@@ -41,12 +55,15 @@ function init() {
 				mapStyle: Cesium.BingMapsStyle.AERIAL_WITH_LABELS
 			})
 		});
+		
+
 	viewer.terrainProvider = new Cesium.CesiumTerrainProvider({
 			url: 'https://assets.agi.com/stk-terrain/world',
 			requestVertexNormals: true
 		});
 
 	viewer.scene.globe.depthTestAgainstTerrain = true;
+	viewer.scene.globe.enableLighting = true;
 	
 	var span = document.createElement('span');
 	span.style.position = 'absolute';
@@ -75,6 +92,18 @@ function init() {
 	function flyHome() {
 		console.log("Flying back to home position...");
 		camera.flyHome();
+	}
+	
+	function calcHeightAtCameraPosition() {
+		var posCarto = Cesium.Cartographic.fromCartesian(camera.position);
+		var posDegrees = new Cesium.Cartographic(rad2deg(posCarto.longitude), rad2deg(posCarto.latitude));
+		var positions = [
+			Cesium.Cartographic.fromDegrees(rad2deg(posCarto.longitude), rad2deg(posCarto.latitude))
+		];
+		var promise = Cesium.sampleTerrain(terrainProvider, 11, positions);
+		Cesium.when(promise, function(updatedPositions) {
+			heightAtCameraPosition = updatedPositions[0].height;
+		});
 	}
 	
 	(function () {
@@ -224,7 +253,7 @@ function init() {
 						flytoLocation('redrocks');
 					});
 					VRSamplesUtil.addButton("Fly to Denver Downtown", "S", null, null, function () {
-						flytoLocation('denver_downtown');
+						flytoLocation('denver_downtown_tight');
 					});
 					VRSamplesUtil.addButton("Reset Pose", "R", null, null, function () {
 						vrDisplay.resetPose();
