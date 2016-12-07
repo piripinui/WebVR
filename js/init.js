@@ -9,7 +9,8 @@ lastGoodHeight,
 locations = {
 	denver: new Cesium.Cartesian3(-1272209.292469148, -4751630.941108344, 4063428.939909443),
 	redrocks: new Cesium.Cartesian3(-1289792.3587257643, -4746245.525598164, 4051013.2689858945),
-	controller: Cesium.Cartesian3.fromDegrees(-75.62898254394531, 40.02804946899414, 0.0)
+	controller: Cesium.Cartesian3.fromDegrees(-75.62898254394531, 40.02804946899414, 0.0),
+	denver_downtown: Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 10000)
 },
 vrGamepads = [];;
 
@@ -221,6 +222,9 @@ function init() {
 					VRSamplesUtil.addButton("Fly to Home", "F", null, null, flyHome);
 					VRSamplesUtil.addButton("Fly to Redrocks", "D", null, null, function () {
 						flytoLocation('redrocks');
+					});
+					VRSamplesUtil.addButton("Fly to Denver Downtown", "S", null, null, function () {
+						flytoLocation('denver_downtown');
 					});
 					VRSamplesUtil.addButton("Reset Pose", "R", null, null, function () {
 						vrDisplay.resetPose();
