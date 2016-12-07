@@ -11,7 +11,8 @@ locations = {
 	redrocks : new Cesium.Cartesian3(-1289792.3587257643, -4746245.525598164, 4051013.2689858945),
 	controller : Cesium.Cartesian3.fromDegrees(-75.62898254394531, 40.02804946899414, 0.0),
 	denver_downtown : Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 10000),
-	denver_downtown_tight : Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 2500)
+	denver_downtown_tight : Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 2500),
+	denver_3d_buildings: Cesium.Cartesian3.fromDegrees(-105.006509, 39.783062)
 },
 vrGamepads = [],
 heightAtCameraPosition,
@@ -75,7 +76,7 @@ function init() {
 	viewer.scene.fxaa = false;
 
 	// Load up Denver building data.
-	var promise = Cesium.GeoJsonDataSource.load('data/denver.json');
+	var promise = Cesium.GeoJsonDataSource.load('data/denver_small.json');
 	promise.then(function (dataSource) {
 		viewer.dataSources.add(dataSource);
 
@@ -90,7 +91,7 @@ function init() {
 			//Remove the outlines.
 			entity.polygon.outline = false;
 
-			entity.polygon.height = entity._properties.BASEELEV_M - 30;
+			entity.polygon.height = entity._properties.BASEELEV_M;
 			entity.polygon.extrudedHeight = entity._properties.TOPELEV_M - 30;
 		}
 		console.log("Finished loading buildings...");
@@ -288,6 +289,9 @@ function init() {
 					});
 					VRSamplesUtil.addButton("Fly to Denver Downtown", "S", null, null, function () {
 						flytoLocation('denver_downtown_tight');
+					});
+					VRSamplesUtil.addButton("Denver Downtown 3D Buildings", "A", null, null, function () {
+						flytoLocation('denver_3d_buildings');
 					});
 					VRSamplesUtil.addButton("Reset Pose", "R", null, null, function () {
 						vrDisplay.resetPose();
