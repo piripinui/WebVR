@@ -12,7 +12,7 @@ locations = {
 	controller : Cesium.Cartesian3.fromDegrees(-75.62898254394531, 40.02804946899414, 0.0),
 	denver_downtown : Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 10000),
 	denver_downtown_tight : Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 2500),
-	denver_3d_buildings: Cesium.Cartesian3.fromDegrees(-105.006509, 39.783062)
+	denver_3d_buildings: Cesium.Cartesian3.fromDegrees(-105.006509, 39.783062, 2500)
 },
 vrGamepads = [],
 heightAtCameraPosition,
