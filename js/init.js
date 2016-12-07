@@ -52,6 +52,7 @@ function init() {
 	span.style.top = '10px';
 	span.style.left = '10px';
 	span.style.color = "white";
+	span.style["font-family"] = "Courier New";
 	span.style["z-index"] = '999';
 	span.textContent = "Debug";
 	viewer.container.appendChild(span);
@@ -60,7 +61,7 @@ function init() {
 	var viveControllerModel;
 	var lastLeftRight, lastUpDown;
 
-	var lookQ = async.queue(function(task, callback) {
+/* 	var lookQ = async.queue(function(task, callback) {
 		switch(task.type) {
 			case "left": {
 				window.setTimeout(function() {
@@ -91,10 +92,21 @@ function init() {
 				break;
 			}
 		}
-	});
+	}); */
 		
 	function rad2deg(rad) {
 		return rad * (180 / Math.PI);
+	}
+	
+	function pad(num, size) {
+		var s = num+"";
+		while (s.length < size) s = "0" + s;
+		return s;
+	}
+	
+	function flyHome() {
+		console.log("Flying back to home position...");
+		camera.flyHome();
 	}
 	
 	(function () {
@@ -190,6 +202,8 @@ function init() {
 			var hmdWidth = leftEye.renderWidth + rightEye.renderWidth;
 			var hmdHeight = leftEye.renderHeight + rightEye.renderHeight;
 			
+			camera.flyHome();
+			
 			console.log("HDM is displaying " + hmdWidth + " pixels wide and " + hmdHeight + " pixels high.");
 			var hmdAspectRatio = hmdWidth / hmdHeight;
 			// PJR Assuming a Chrome browser here.
@@ -207,10 +221,6 @@ function init() {
 				}, function () {
 				VRSamplesUtil.addError("requestPresent failed.", 2000);
 			});
-			
-								
-			
-			camera.flyHome();
 		}
 		function onVRExitPresent() {
 			if (!vrDisplay.isPresenting)
@@ -241,7 +251,11 @@ function init() {
 					vrDisplay.depthNear = 0.1;
 					vrDisplay.depthFar = 1024.0;
 
-					VRSamplesUtil.addButton("Reset Pose", "R", null, function () {
+					VRSamplesUtil.addButton("Fly to Home", "F", null, null, flyHome);
+					VRSamplesUtil.addButton("Fly to Redrocks", "D", null, null, function () {
+						flytoLocation('redrocks');
+					});
+					VRSamplesUtil.addButton("Reset Pose", "R", null, null, function () {
 						vrDisplay.resetPose();
 					});
 					if (vrDisplay.capabilities.canPresent)
@@ -325,7 +339,12 @@ function init() {
 						
 						var hmdPitch = calculateAngle(0);
 						var hmdHeading = calculateAngle(1);
-						var hmdRoll = calculateAngle(2);
+						var hmdRoll = calculateAngle(2) - Math.PI / 2;
+						
+						if (hmdRoll < 0) {
+							// Ensure angles are between 0 and 360 degrees.
+							hmdRoll = Math.PI * 2 + hmdRoll;
+						}
 						
 						
 						if (!lastLeftRight) {
@@ -336,26 +355,28 @@ function init() {
 						}
 												
 						if (!isNaN(hmdHeading) && !isNaN(hmdPitch) && !isNaN(hmdRoll)) {
-							//console.log("Heading = " + rad2deg(hmdHeading) + ", Camera heading= " + rad2deg(camera.heading));
+							//console.log("Heading = " + rad2deg(hmdHeading) + ", HMD pitch = " + rad2deg(hmdPitch) + ", HMD roll = " + rad2deg(hmdRoll) + ", " + frameData.pose.orientation[2]);
 
 							var hdiff = hmdHeading - lastLeftRight;
 							var vdiff = hmdPitch - lastUpDown;
 						
-							//camera.lookRight(hdiff);
-							//camera.lookDown(vdiff);
+							camera.lookRight(hdiff);
+							camera.lookDown(vdiff);
 							
-							lookQ.push({
-								type: "right",
-								ang: hdiff;
+
+							camera.setView({
+								orientation: {
+									heading: hmdHeading,
+									pitch: Math.PI / 2 - hmdPitch,
+									roll: hmdRoll
+								}
 							});
-							lookQ.push({
-								type: "down",
-								ang: vdiff
-							})
 							
 							lastUpDown = hmdPitch;
 							lastLeftRight = hmdHeading;
-							span.textContent = "Heading = " + rad2deg(hmdHeading) + ", Camera heading= " + rad2deg(camera.heading);
+							span.textContent = "HMD Heading = " + pad(rad2deg(hmdHeading).toFixed(2), 6) + ", Camera heading= " + pad(rad2deg(camera.heading).toFixed(2), 6) 
+												+ ", HMD pitch = " + pad(rad2deg(hmdPitch).toFixed(2), 6) + ", Camera pitch = " + pad(rad2deg(camera.pitch).toFixed(2), 6)
+												+ ", HMD roll = " + pad(rad2deg(hmdRoll).toFixed(2), 6) + ", Camera roll = " + pad(rad2deg(camera.roll).toFixed(2), 6);
 						}
 					}
 					
@@ -376,7 +397,11 @@ function init() {
 					// Send the image to the VR headset.
 					vrDisplay.submitFrame();
 				} else {
+					var camera = viewer.scene.camera;
 					gl.viewport(0, 0, webglCanvas.width, webglCanvas.height);
+					span.textContent = "Camera heading = " + pad(rad2deg(camera.heading).toFixed(2), 6) 
+									+ ", Camera pitch = " + pad(rad2deg(camera.pitch).toFixed(2), 6)
+									+ ", Camera roll = " + pad(rad2deg(camera.roll).toFixed(2), 6);
 					viewer.render();
 
 					//stats.renderOrtho();
