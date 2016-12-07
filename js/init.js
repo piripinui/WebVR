@@ -60,39 +60,6 @@ function init() {
 	var camera = viewer.scene.camera;
 	var viveControllerModel;
 	var lastLeftRight, lastUpDown;
-
-/* 	var lookQ = async.queue(function(task, callback) {
-		switch(task.type) {
-			case "left": {
-				window.setTimeout(function() {
-					camera.lookLeft(task.ang);
-					callback();
-				}, 10);
-				break;
-			}
-			case "right": {
-				window.setTimeout(function() {
-					camera.lookRight(task.ang);
-					callback();
-				}, 10);
-				break;
-			}
-			case "down": {
-				window.setTimeout(function() {
-					camera.lookDown(task.ang);
-					callback();
-				}, 10);
-				break;
-			}
-			case "up": {
-				window.setTimeout(function() {
-					camera.lookUp(task.ang);
-					callback();
-				}, 10);
-				break;
-			}
-		}
-	}); */
 		
 	function rad2deg(rad) {
 		return rad * (180 / Math.PI);
