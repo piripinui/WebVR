@@ -12,7 +12,7 @@ locations = {
 	controller : Cesium.Cartesian3.fromDegrees(-75.62898254394531, 40.02804946899414, 0.0),
 	denver_downtown : Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 10000),
 	denver_downtown_tight : Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 2500),
-	denver_3d_buildings: Cesium.Cartesian3.fromDegrees(-105.006509, 39.783062, 2500)
+	denver_3d_buildings: Cesium.Cartesian3.fromDegrees(-104.999471, 39.749217, 1800)
 },
 vrGamepads = [],
 heightAtCameraPosition,
@@ -91,8 +91,8 @@ function init() {
 			//Remove the outlines.
 			entity.polygon.outline = false;
 
-			entity.polygon.height = entity._properties.BASEELEV_M;
-			entity.polygon.extrudedHeight = entity._properties.TOPELEV_M - 30;
+			entity.polygon.height = entity._properties.BASEELEV_M - 20;
+			entity.polygon.extrudedHeight = entity._properties.TOPELEV_M - 20;
 		}
 		console.log("Finished loading buildings...");
 	}).otherwise(function (error) {
