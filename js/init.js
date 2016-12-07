@@ -47,13 +47,20 @@ function flytoLocation(location) {
 }
 
 function init() {
+	// Using Mapbox tiles gives a slightly better framerate.
+	var mbImageryProvider = new Cesium.MapboxImageryProvider({
+		mapId: 'mapbox.streets'
+	});
+	// The Bing tiles looks cool but kill the framerate when zoomed in.
+	var bingImageryProvider = new Cesium.BingMapsImageryProvider({
+				url : '//dev.virtualearth.net',
+				mapStyle: Cesium.BingMapsStyle.AERIAL_WITH_LABELS
+			});
 	viewer = new Cesium.Viewer('cesiumContainer', {
 			vrButton: true,
 			baseLayerPicker: false,
-			imageryProvider: new Cesium.BingMapsImageryProvider({
-				url : '//dev.virtualearth.net',
-				mapStyle: Cesium.BingMapsStyle.AERIAL_WITH_LABELS
-			})
+			imageryProvider: mbImageryProvider,
+			scene3DOnly: true
 		});
 		
 
@@ -64,6 +71,9 @@ function init() {
 
 	viewer.scene.globe.depthTestAgainstTerrain = true;
 	viewer.scene.globe.enableLighting = true;
+	
+	// Disabling this (Fast Approximate Anti-aliasing) can improve the framerate.
+	viewer.scene.fxaa = false;
 	
 	var span = document.createElement('span');
 	span.style.position = 'absolute';
