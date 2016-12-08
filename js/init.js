@@ -247,6 +247,8 @@ function init() {
 			var rightEye = vrDisplay.getEyeParameters("right");
 			var hmdWidth = leftEye.renderWidth + rightEye.renderWidth;
 			var hmdHeight = leftEye.renderHeight + rightEye.renderHeight;
+			
+			console.log("leftEye = " + leftEye);
 
 			camera.flyHome();
 
