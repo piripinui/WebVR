@@ -3423,5 +3423,6 @@ VRDisplay.isPresenting;
 VRDisplay.getEyeParameters = function(arg) {};
 VRDisplay.requestPresent = function(arg) {};
 VRDisplay.submitFrame = function() {};
+VRDisplay.exitPresent = function() {};
 navigator.getVRDevices = function() {};
 navigator.getVRDisplays = function() {};
