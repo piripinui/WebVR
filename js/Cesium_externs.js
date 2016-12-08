@@ -3411,3 +3411,5 @@ VRSamples = function() {};
 VRSamplesUtil.addError;
 VRSamplesUtil.addButton = function(opt1, opt2, opt3, opt4, opt5) {};
 VRSamplesUtil.addInfo = function(opt1, opt2) {};
+VRDisplay.capabilities;
+VRDisplay.capabilities.hasExternalDisplay;
