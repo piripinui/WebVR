@@ -3421,5 +3421,6 @@ VRDisplay.getFrameData = function(arg1) {};
 VRDisplay.isPresenting;
 VRDisplay.getEyeParameters = function(arg) {};
 VRDisplay.requestPresent = function(arg) {};
+VRDisplay.submitFrame = function() {};
 navigator.getVRDevices = function() {};
 navigator.getVRDisplays = function() {};
