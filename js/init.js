@@ -282,6 +282,7 @@ function init() {
 		if (navigator.getVRDisplays) {
 			frameData = new VRFrameData();
 			navigator.getVRDisplays().then(function (displays) {
+				console.log("Detected VR display: " + displays.length);
 				if (displays.length > 0) {
 					vrDisplay = displays[0];
 					vrDisplay.depthNear = 0.1;
