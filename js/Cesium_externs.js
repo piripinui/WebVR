@@ -3390,6 +3390,7 @@ Cesium.CallbackProperty = function(cb, constant) {};
 
 function init() {};
 
+viewer;
 Cesium.MapboxImageryProvider = function(options) {};
 Cesium.Viewer = function(container, options) {};
 Cesium.Viewer.container;
