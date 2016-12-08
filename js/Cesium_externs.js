@@ -3417,5 +3417,7 @@ VRDisplay.capabilities.canPresent;
 VRDisplay.requestAnimationFrame = function(arg) {};
 VRDisplay.getFrameData = function(arg1) {};
 VRDisplay.isPresenting;
+VRDisplay.getEyeParameters = function(arg) {};
+VRDisplay.requestPresent = function(arg) {};
 navigator.getVRDevices = function() {};
 navigator.getVRDisplays = function() {};

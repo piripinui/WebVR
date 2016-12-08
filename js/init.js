@@ -18,6 +18,16 @@ vrGamepads = [],
 heightAtCameraPosition,
 eyeSeparationOverride;
 
+// Support for Closure compilation.
+
+window['init'] = init;
+window['flytoLocation'] = flytoLocation;
+window['gotoLocation'] = gotoLocation;
+window['heightAtCameraPosition'] = heightAtCameraPosition;
+window['eyeSeparationOverride'] = eyeSeparationOverride;
+window['lastGoodHeight'] = lastGoodHeight;
+window['locations'] = locations;
+
 function newWindowRetest() {
 	winRef = window.open('' + self.location, 'mywin',
 			'width=350,height=300,toolbar=1,status=1,resizable=1,scrollbars=1')
@@ -592,12 +602,4 @@ function init() {
 	})();
 };
 
-// Support for Closure compilation.
 
-window['init'] = init;
-window['flytoLocation'] = flytoLocation;
-window['gotoLocation'] = gotoLocation;
-window['heightAtCameraPosition'] = heightAtCameraPosition;
-window['eyeSeparationOverride'] = eyeSeparationOverride;
-window['lastGoodHeight'] = lastGoodHeight;
-window['locations'] = locations;
