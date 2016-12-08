@@ -3407,6 +3407,8 @@ Cesium.Entity._properties.TOPELEV_M;
 Cesium.Cartographic.fromCartesian = function(opt) {};
 Cesium.sampleTerrain = function(a1, a2, a3) {};
 Cesium.when = function(a1, a2) {};
+Cesium.Camera.flyHome = function(arg) {};
+Cesium.Camera.setView = function(opts) {};
 VRSamples = function() {};
 VRSamplesUtil.addError;
 VRSamplesUtil.addButton = function(opt1, opt2, opt3, opt4, opt5) {};
