@@ -596,3 +596,5 @@ function init() {
 window['init'] = init;
 window['flytoLocation'] = flytoLocation;
 window['gotoLocation'] = gotoLocation;
+window['heightAtCameraPosition'] = heightAtCameraPosition;
+window['eyeSeparationOverride'] = eyeSeparationOverride;
