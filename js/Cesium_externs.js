@@ -3392,7 +3392,6 @@ function init() {};
 
 viewer;
 locations;
-lastGoodHeight;
 Cesium.MapboxImageryProvider = function(options) {};
 Cesium.Viewer = function(container, options) {};
 Cesium.Viewer.container;

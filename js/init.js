@@ -599,3 +599,5 @@ window['flytoLocation'] = flytoLocation;
 window['gotoLocation'] = gotoLocation;
 window['heightAtCameraPosition'] = heightAtCameraPosition;
 window['eyeSeparationOverride'] = eyeSeparationOverride;
+window['lastGoodHeight'] = lastGoodHeight;
+window['locations'] = locations;
