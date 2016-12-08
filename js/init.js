@@ -49,25 +49,28 @@ function flytoLocation(location) {
 
 function init() {
 	// Using Mapbox tiles gives a slightly better framerate.
-	var mbImageryProvider = new Cesium.MapboxImageryProvider({
-			mapId : 'mapbox.streets'
-		});
+	var mbOptions = {
+			"mapId" : 'mapbox.streets'
+		};
+	var mbImageryProvider = new Cesium.MapboxImageryProvider(mbOptions);
 	// The Bing tiles looks cool but kill the framerate when zoomed in.
 	var bingImageryProvider = new Cesium.BingMapsImageryProvider({
-			url : '//dev.virtualearth.net',
-			mapStyle : Cesium.BingMapsStyle.AERIAL_WITH_LABELS
+			"url" : '//dev.virtualearth.net',
+			"mapStyle" : Cesium.BingMapsStyle.AERIAL_WITH_LABELS
 		});
-	viewer = new Cesium.Viewer('cesiumContainer', {
-			vrButton : true,
-			baseLayerPicker : false,
-			imageryProvider : mbImageryProvider,
-			scene3DOnly : true
-		});
-
-	viewer.terrainProvider = new Cesium.CesiumTerrainProvider({
-			url : 'https://assets.agi.com/stk-terrain/world',
-			requestVertexNormals : true
-		});
+	var viewerOptions = {
+			"vrButton" : true,
+			"baseLayerPicker" : false,
+			"imageryProvider" : mbImageryProvider,
+			"scene3DOnly" : true
+		};
+	viewer = new Cesium.Viewer('cesiumContainer', viewerOptions);
+	
+	var terrainOptions = {
+			"url" : 'https://assets.agi.com/stk-terrain/world',
+			"requestVertexNormals" : true
+		};
+	viewer.terrainProvider = new Cesium.CesiumTerrainProvider(terrainOptions);
 
 	viewer.scene.globe.depthTestAgainstTerrain = true;
 	viewer.scene.globe.enableLighting = true;
@@ -82,6 +85,7 @@ function init() {
 
 		//Get the array of entities
 		var entities = dataSource.entities.values;
+
 		var color = new Cesium.Color(0.8, 0.8, 0.8, 1.0);
 		console.log("Processing " + entities.length + " entities...");
 		for (var i = 0; i < entities.length; i++) {
@@ -95,10 +99,10 @@ function init() {
 			entity.polygon.extrudedHeight = entity._properties.TOPELEV_M - 20;
 		}
 		console.log("Finished loading buildings...");
-	}).otherwise(function (error) {
+	});/* .otherwise(function (error) {
 		//Display any errors encountered while loading.
 		window.alert(error);
-	});
+	}); */
 
 	var span = document.createElement('span');
 	span.style.position = 'absolute';
@@ -586,3 +590,9 @@ function init() {
 		}
 	})();
 };
+
+// Support for Closure compilation.
+
+window['init'] = init;
+window['flytoLocation'] = flytoLocation;
+window['gotoLocation'] = gotoLocation;

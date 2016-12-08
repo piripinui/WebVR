@@ -3385,3 +3385,22 @@ Cesium.EntityView.prototype.update = function(currentTime, bs) {};
  * @constructor
  */
 Cesium.CallbackProperty = function(cb, constant) {};
+
+// PJR mods.
+
+function init() {};
+
+Cesium.MapboxImageryProvider = function(options) {};
+Cesium.Viewer = function(container, options) {};
+Cesium.Viewer.container;
+Cesium.Viewer.dataSources;
+Cesium.Entity.polygon;
+Cesium.Entity.polygon.material;
+Cesium.Entity.polygon.outline;
+Cesium.Entity.polygon.height;
+Cesium.Entity.polygon.extrudedHeight;
+Cesium.Entity._properties;
+Cesium.Entity._properties.BASEELEV_M;
+Cesium.Entity._properties.TOPELEV_M;
+VRSamples = function() {};
+VRSamplesUtil.addError;
