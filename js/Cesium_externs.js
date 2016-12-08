@@ -3412,6 +3412,7 @@ Cesium.Camera.setView = function(opts) {};
 VRSamples = function() {};
 VRSamplesUtil.addError;
 VRSamplesUtil.addButton = function(opt1, opt2, opt3, opt4, opt5) {};
+VRSamplesUtil.removeButton = function(opt1) {};
 VRSamplesUtil.addInfo = function(opt1, opt2) {};
 VRDisplay.capabilities;
 VRDisplay.capabilities.hasExternalDisplay;
