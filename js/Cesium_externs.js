@@ -3391,6 +3391,7 @@ Cesium.CallbackProperty = function(cb, constant) {};
 function init() {};
 
 viewer;
+locations;
 Cesium.MapboxImageryProvider = function(options) {};
 Cesium.Viewer = function(container, options) {};
 Cesium.Viewer.container;
@@ -3403,5 +3404,10 @@ Cesium.Entity.polygon.extrudedHeight;
 Cesium.Entity._properties;
 Cesium.Entity._properties.BASEELEV_M;
 Cesium.Entity._properties.TOPELEV_M;
+Cesium.Cartographic.fromCartesian = function(opt) {};
+Cesium.sampleTerrain = function(a1, a2, a3) {};
+Cesium.when = function(a1, a2) {};
 VRSamples = function() {};
 VRSamplesUtil.addError;
+VRSamplesUtil.addButton = function(opt1, opt2, opt3, opt4, opt5) {};
+VRSamplesUtil.addInfo = function(opt1, opt2) {};

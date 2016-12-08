@@ -7,12 +7,12 @@ projNear = 1, projFar = 500000000,
 eyeSeperationDenominator = 20,
 lastGoodHeight,
 locations = {
-	denver : new Cesium.Cartesian3(-1272209.292469148, -4751630.941108344, 4063428.939909443),
-	redrocks : new Cesium.Cartesian3(-1289792.3587257643, -4746245.525598164, 4051013.2689858945),
-	controller : Cesium.Cartesian3.fromDegrees(-75.62898254394531, 40.02804946899414, 0.0),
-	denver_downtown : Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 10000),
-	denver_downtown_tight : Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 2500),
-	denver_3d_buildings: Cesium.Cartesian3.fromDegrees(-104.999471, 39.749217, 1800)
+	"denver" : new Cesium.Cartesian3(-1272209.292469148, -4751630.941108344, 4063428.939909443),
+	"redrocks" : new Cesium.Cartesian3(-1289792.3587257643, -4746245.525598164, 4051013.2689858945),
+	"controller" : Cesium.Cartesian3.fromDegrees(-75.62898254394531, 40.02804946899414, 0.0),
+	"denver_downtown" : Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 10000),
+	"denver_downtown_tight" : Cesium.Cartesian3.fromDegrees(-104.992089, 39.761292, 2500),
+	"denver_3d_buildings" : Cesium.Cartesian3.fromDegrees(-104.999471, 39.749217, 1800)
 },
 vrGamepads = [],
 heightAtCameraPosition,
@@ -286,7 +286,7 @@ function init() {
 					vrDisplay = displays[0];
 					vrDisplay.depthNear = 0.1;
 					vrDisplay.depthFar = 1024.0;
-
+					console.log("Adding buttons...");
 					VRSamplesUtil.addButton("Fly to Home", "F", null, null, flyHome);
 					VRSamplesUtil.addButton("Fly to Redrocks", "D", null, null, function () {
 						flytoLocation('redrocks');
