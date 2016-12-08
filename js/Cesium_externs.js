@@ -3413,6 +3413,7 @@ VRSamplesUtil.addButton = function(opt1, opt2, opt3, opt4, opt5) {};
 VRSamplesUtil.addInfo = function(opt1, opt2) {};
 VRDisplay.capabilities;
 VRDisplay.capabilities.hasExternalDisplay;
+VRDisplay.capabilities.canPresent;
 VRDisplay.requestAnimationFrame = function(arg) {};
 VRDisplay.getFrameData = function(arg1) {};
 VRDisplay.isPresenting;
